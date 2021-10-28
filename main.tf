@@ -19,14 +19,17 @@ resource "aws_iam_role" "test_lambda_role" {
 EOF
 }
 
+data "archive_file" "init" {
+  type        = "zip"
+  source_file = "${path.module}/hello.py"
+  output_path = "${path.module}/files/hello.zip"
+}
+
 resource "aws_lambda_function" "test_lambda" {
-  filename      = "test.zip"
+  filename      = "${path.module}/files/hello.zip"
   function_name = "lambda_function"
   role          = aws_iam_role.test_lambda_role.arn
-  handler       = "index.test"
-
-  
-  source_code_hash = filebase64sha256("test.zip")
-
+  handler       = "hello.welcome"
+  # source_code_hash = filebase64sha256("test.zip")
   runtime = "python3.7"
 }
