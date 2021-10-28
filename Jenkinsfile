@@ -61,7 +61,9 @@ pipeline {
 
         stage('Apply') {
             steps {
-                sh "pwd;cd terraform ; terraform apply -input=false tfplan"
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'accesskey_secretkey']]){
+                    sh "pwd;cd terraform ; terraform apply -input=false tfplan"
+                }
             }
         }
     }
