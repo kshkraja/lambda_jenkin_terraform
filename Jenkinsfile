@@ -1,22 +1,24 @@
 pipeline {
 
-    parameters {
-        string(name: 'environment', defaultValue: 'terraform', description: 'Workspace/environment file to use for deployment')
-        booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?')
+//     parameters {
+//         string(name: 'environment', defaultValue: 'terraform', description: 'Workspace/environment file to use for deployment')
+//         booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?')
 
+//     }
+
+
+//      environment {
+//         AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+//         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+//     }
+
+    agent {
+        node { label 'slave' }    
     }
-
-
-     environment {
-        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-    }
-
-   agent  any
-        options {
-                timestamps ()
-                ansiColor('xterm')
-            }
+    options {
+        timestamps ()
+        ansiColor('xterm')
+        }
     stages {
         stage('checkout') {
             steps {
@@ -31,11 +33,14 @@ pipeline {
 
         stage('Plan') {
             steps {
-                sh 'pwd;cd terraform ; terraform init -input=false'
-                sh 'pwd;cd terraform ; terraform workspace new ${environment}'
-                sh 'pwd;cd terraform ; terraform workspace select ${environment}'
-                sh "pwd;cd terraform ; terraform plan -input=false -out tfplan "
-                sh 'pwd;cd terraform ; terraform show -no-color tfplan > tfplan.txt'
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'accesskey_secretkey']]){
+                    sh 'pwd;cd terraform ; terraform init -input=false'
+                    sh 'pwd;cd terraform ; terraform workspace new ${environment}'
+                    sh 'pwd;cd terraform ; terraform workspace select ${environment}'
+                    sh "pwd;cd terraform ; terraform plan -input=false -out tfplan "
+                    sh 'pwd;cd terraform ; terraform show -no-color tfplan > tfplan.txt'
+                }
+
             }
         }
         stage('Approval') {
