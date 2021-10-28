@@ -27,7 +27,7 @@ data "archive_file" "init" {
 
 resource "aws_lambda_function" "test_lambda" {
   filename      = "${path.module}/files/hello.zip"
-  function_name = "lambda_function"
+  function_name = "welcome"
   role          = aws_iam_role.test_lambda_role.arn
   handler       = "hello.welcome"
   # source_code_hash = filebase64sha256("test.zip")
