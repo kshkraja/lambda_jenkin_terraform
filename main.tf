@@ -31,5 +31,6 @@ resource "aws_lambda_function" "test_lambda" {
   role          = aws_iam_role.test_lambda_role.arn
   handler       = "hello.welcome"
   # source_code_hash = filebase64sha256("test.zip")
+  source_code_hash = data.archive_file.init.output_base64sha256
   runtime = "python3.7"
 }
