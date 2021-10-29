@@ -1,2 +1,2 @@
 def welcome(event,context):
-    print("Hi world")
+    print("Hello world")
